@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+  <style>
+.nav-arrow.next {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 32px;
+  color: #ff0000;
+  text-decoration: none;
+  background: rgba(255, 0, 0, 0.1);
+  padding: 10px 14px;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff0000;
+  transition: 0.3s;
+}
+
+.nav-arrow.next:hover {
+  background: rgba(255, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    video#bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      filter: brightness(0.4) saturate(1.2);
+    }
+
+    .calculator {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 0, 0, 0.3);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+      padding: 20px;
+      max-width: 360px;
+      width: 100%;
+      margin: auto;
+      margin-top: 50px;
+      color: #ff0000;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      color: #ff0000;
+      margin-bottom: 15px;
+      text-shadow: 0 0 12px #ff0000;
+    }
+
+    .display {
+      background: rgba(255, 0, 0, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 28px;
+      text-align: right;
+      color: #ff0000;
+      box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.4);
+      margin-bottom: 15px;
+      overflow-x: auto;
+      white-space: nowrap;
+      min-height: 40px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .btn {
+      background: transparent;
+      border: 2px solid #ff0000;
+      color: #ff0000;
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-shadow: 0 0 8px #ff0000;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    }
+
+    .btn:hover {
+      background: rgba(255, 0, 0, 0.15);
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #ff0000;
+    }
+
+    .btn:active {
+      background: rgba(255, 0, 0, 0.25);
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 400px) {
+      .calculator {
+        padding: 15px;
+      }
+
+      .btn {
+        padding: 14px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+  <video autoplay muted loop id="bgVideo">
+    <source src="background.mp4" type="video/mp4" />
+    Your browser does not support HTML5 video.
+  </video>
+
+  <!-- ?? Calculator -->
+  <div class="calculator">
+    <div class="title">Basic Calci</div>
+
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button class="btn" onclick="clearDisplay()">AC</button>
+      <button class="btn" onclick="deleteLast()">DEL</button>
+      <button class="btn" onclick="append('%')">%</button>
+      <button class="btn" onclick="append('/')">÷</button>
+
+      <button class="btn" onclick="append('7')">7</button>
+      <button class="btn" onclick="append('8')">8</button>
+      <button class="btn" onclick="append('9')">9</button>
+      <button class="btn" onclick="append('*')">×</button>
+
+      <button class="btn" onclick="append('4')">4</button>
+      <button class="btn" onclick="append('5')">5</button>
+      <button class="btn" onclick="append('6')">6</button>
+      <button class="btn" onclick="append('-')">-</button>
+
+      <button class="btn" onclick="append('1')">1</button>
+      <button class="btn" onclick="append('2')">2</button>
+      <button class="btn" onclick="append('3')">3</button>
+      <button class="btn" onclick="append('+')">+</button>
+
+      <button class="btn" onclick="append('00')">00</button>
+      <button class="btn" onclick="append('0')">0</button>
+      <button class="btn" onclick="append('.')">.</button>
+      <button class="btn" onclick="calculate()">=</button>
+    </div>
+  </div>
+
+  <!-- ?? Calculator Logic + Keyboard Support -->
+  <script>
+    const display = document.getElementById("display");
+
+    function append(char) {
+      if (display.textContent === "0" || display.textContent === "Error") {
+        display.textContent = char;
+      } else {
+        display.textContent += char;
+      }
+    }
+
+    function clearDisplay() {
+      display.textContent = "0";
+    }
+
+    function deleteLast() {
+      if (display.textContent.length > 1) {
+        display.textContent = display.textContent.slice(0, -1);
+      } else {
+        display.textContent = "0";
+      }
+    }
+
+    function calculate() {
+      try {
+        const expression = display.textContent.replace('%', '/100');
+        const result = eval(expression);
+        display.textContent = result;
+      } catch (e) {
+        display.textContent = "Error";
+      }
+    }
+
+    // ? Keyboard support
+    document.addEventListener("keydown", (e) => {
+      const key = e.key;
+
+      if ("0123456789+-*/.%".includes(key)) {
+        append(key);
+      }
+
+      if (key === "Enter" || key === "=") {
+        e.preventDefault();
+        calculate();
+      }
+
+      if (key === "Backspace") {
+        e.preventDefault();
+        deleteLast();
+      }
+
+      if (key === "Escape" || key === "Delete") {
+        e.preventDefault();
+        clearDisplay();
+      }
+       });
+  </script>
+<a href="scientific.html" class="nav-arrow next">&#10145;</a>
+
+</body>
+
+
+</html>
